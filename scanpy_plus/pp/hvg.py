@@ -37,7 +37,8 @@ def select_hvg(
     adata,
     ngenes,
     nbatches_min,
-    batch_key
+    batch_key,
+    min_cells = 100
 ):
     """
     Select highly variable genes based on the number of batches and the number of genes
@@ -45,6 +46,7 @@ def select_hvg(
     ngenes: number of genes to select
     nbatches_min: minimum number of batches to select genes
     batch_key: batch key to use for selecting highly variable genes
+    min_cells: minimum number of cells to be present in a batch. If less, then the batches are mixed together.
     Returns:
     adata: anndata.AnnData
     nbatches_min: int minimum number of batches to select genes
@@ -52,7 +54,7 @@ def select_hvg(
     label_dict: dict dictionary of labels for the number of batches
     label_dict2: dict dictionary of labels for the number of genes
     Example:
-    hvg_var = select_hvg(adata, ngenes, nbatches_min, batch_key)
+    hvg_var = select_hvg(adata, ngenes, nbatches_min, batch_key, min_cells = 100)
     """
     from loguru import logger
     import numpy as np
@@ -60,7 +62,7 @@ def select_hvg(
     
     logger.info("Cleaning batches: relegate small batches out")
     new_batch_key = batch_key + "_1"
-    adata, new_batch_key = clean_batches(adata, batch_key, new_batch_key, min_cells=1000)
+    adata, new_batch_key = clean_batches(adata, batch_key, new_batch_key, min_cells=100)
     
     logger.info(f"Selecting HVGs with {ngenes} genes and {nbatches_min} batches")
     sc.pp.highly_variable_genes(
